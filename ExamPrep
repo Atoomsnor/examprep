@@ -1,0 +1,47 @@
+int    ft_atoi_base(const char *str, int str_base)
+{
+	int    result;
+	int    parity;
+	int    i;
+	int    value;
+
+	if (str_base < 2 || str_base > 16)
+		return (0);
+	result = 0;
+	parity = 1;
+	i = 0;
+
+	while (str[i] == ' ' || str[i] == '\t' || str[i] == '\n' 
+		|| str[i] == '\v' || str[i] == '\f' || str[i] == '\r')
+		i++;
+	
+	if (str[i] == '-' || str[i] == '+')
+	{
+		if (str[i] == '-')
+			parity = -1;
+		i++;
+	}
+	
+	while (str[i] != '\0')
+	{
+		if (str[i] >= '0' && str[i] <= '9')
+			value = str[i] - '0';
+		else if (str[i] >= 'a' && str[i] <= 'f')
+			value = str[i] - 'a' + 10;
+		else if (str[i] >= 'A' && str[i] <= 'F')
+			value = str[i] - 'A' + 10;
+		else
+			break;
+
+		if (value >= str_base)
+			break;
+
+		result = result * str_base + value;
+		i++;
+	}
+	
+	return (result * parity);
+}
+palindrome annagram union inter
+printhex putnbr base atoi
+DOO UNION
