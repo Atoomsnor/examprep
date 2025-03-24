@@ -1,38 +1,32 @@
 #include <unistd.h>
 
-int seen_before(char *str, int max, char c)
+int main(int ac, char **argv)
 {
-	int i = 0;
-	while (i < max)
+	char *str1 = argv[1];
+	char *str2 = argv[2];
+	int i = 0, j = 0;;
+	int printed[127] = {0};
+
+	// if (ac != 3) write/return 0
+	while (str1[i])
 	{
-		if (str[i] == c)
-			return (1);
+		if (!printed[str1[i]])
+		{
+			write(1, &str1[i], 1);
+			printed[str1[i]] = 1;
+		}
 		i++;
 	}
-	return (0);
-}
-
-int main(int argc, char **argv)
-{
-	if (argc == 3)
+	j = 0;
+	while (str2[j])
 	{
-		int i = 0;
-		int j = 0;
-		char	*str1 = argv[1];
-		char	*str2 = argv[2];
-
-		while (str1[i])
+		if (!printed[str2[j]])
 		{
-			if (!seen_before(str1, i, str1[i]))
-				write(1, &str1[i], 1);
-			i++;
+			write(1, &str2[j], 1); 
+			printed[str2[j]] = 1;
 		}
-		while (str2[j])
-		{
-			if (!seen_before(str1, i, str2[j]) && !seen_before(str2, j, str2[j]))
-				write(1, &str2[j], 1);
-			j++;
-		}
+		j++;
 	}
 	write(1, "\n", 1);
+	return (0);
 }
