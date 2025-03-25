@@ -19,7 +19,7 @@ int	ft_atoi_base(const char *str, int base)
 	int	s = 1;
 	int	val;
 
-	while ((*str >= 9 && *str <= 13) || *str ==  32)
+while ((*str >= 9 && *str <= 13) || *str ==  32)
 		str++;
 	if (*str == '-')
 	{
@@ -30,12 +30,12 @@ int	ft_atoi_base(const char *str, int base)
 		str++;
 	while (*str)
 	{
-		if (*str >= '0' && *str <= '9')
-			val = *str - '0';
-		else if (*str >= 'a' && *str <= 'f')
-			val = *str - 'a' + 10;
-		else if (*str >= 'A' && *str <= 'F')
-			val = *str - 'A' + 10;
+	if (*str >= '0' && *str <= '9')
+		val = *str - '0';
+	else if (*str >= 'a' && *str <= 'f')
+		val = *str - 'a' + 10;
+	else if (*str >= 'A' && *str <= 'F')
+		val = *str - 'A' + 10;
 		else
 			break;
 		if (val >= base)
