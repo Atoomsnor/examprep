@@ -30,31 +30,32 @@ void	sort_string(char *str, int length)
 	}
 }
 
-int	next_permutation(char *str, int length)
+int next_permutation(char *str, int length)
 {
 	int i = length - 2;
+	int j = length - 1;
 
-	// Find longest non-increasing suffix
+	// Find pivot (first element from right that's smaller than next)
 	while (i >= 0 && str[i] >= str[i + 1])
 		i--;
+	
 	if (i < 0)
 		return (0);
 
-	// Find rightmost element greater than str[i]
-	int j = length - 1;
+	// Find smallest element in suffix that's greater than pivot
 	while (str[j] <= str[i])
 		j--;
 
 	swap(&str[i], &str[j]);
 
-	// Reverse suffix
-	int left = i + 1;
-	int right = length - 1;
-	while (left < right)
+	// Reverse the suffix (from i+1 to end)
+	i++;
+	j = length - 1;
+	while (i < j)
 	{
-		swap(&str[left], &str[right]);
-		left++;
-		right--;
+		swap(&str[i], &str[j]);
+		i++;
+		j--;
 	}
 
 	return (1);
