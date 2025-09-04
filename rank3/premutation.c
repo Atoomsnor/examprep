@@ -9,7 +9,9 @@ void	write_string(char *str)
 
 void	swap(char *a, char *b)
 {
-	char tmp = *a;
+	char	tmp;
+
+	tmp = *a;
 	*a = *b;
 	*b = tmp;
 }
@@ -36,14 +38,14 @@ int next_permutation(char *str, int length)
 	int j = length - 1;
 
 	// Find pivot (first element from right that's smaller than next)
-	while (i >= 0 && str[i] >= str[i + 1])
+	while (i > 0 && str[i] > str[i + 1])
 		i--;
 	
 	if (i < 0)
 		return (0);
 
 	// Find smallest element in suffix that's greater than pivot
-	while (str[j] <= str[i])
+	while (str[j] < str[i])
 		j--;
 
 	swap(&str[i], &str[j]);

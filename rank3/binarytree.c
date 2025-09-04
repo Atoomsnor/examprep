@@ -6,7 +6,7 @@
 /*   By: roversch <roversch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/27 09:42:41 by roversch          #+#    #+#             */
-/*   Updated: 2025/08/27 09:49:35 by roversch         ###   ########.fr       */
+/*   Updated: 2025/09/04 12:25:56 by roversch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,23 @@ int	biggest_value(t_tree *root)
 	return (value);
 }
 
+int	find_value(t_tree *root, int value)
+{
+	if (root == NULL)
+		return 0;
+
+	if (root->value == value)
+		return 1;
+
+	if (find_value(root->left, value))
+		return 1;
+
+	if (find_value(root->right, value))
+		return 1;
+
+	return 0;
+}
+
 int	main()
 {
 	t_tree *root = malloc(sizeof(t_tree));
@@ -75,14 +92,15 @@ int	main()
 
 	root->right->right = 0;
 	root->right->left = 0;
-	root->value = 5;
+	root->right->value = 5;
 
 	root->left->right = malloc(sizeof(t_tree));
 	root->left->left = 0;
-	root->value = 2;
+	root->left->value = 2;
 
 	root->left->right->left = 0;
 	root->left->right->right = 0;
 	root->left->right->value = 20;
-	printf("%i\n", biggest_value(root));
+	
+	printf("%i\n", find_value(root, 10));
 }
