@@ -68,19 +68,15 @@ int	biggest_value(t_tree *root)
 
 int	find_value(t_tree *root, int value)
 {
-	if (root == NULL)
-		return 0;
-
+	if (root == 0)
+		return (0);
 	if (root->value == value)
-		return 1;
-
-	if (find_value(root->left, value))
-		return 1;
-
-	if (find_value(root->right, value))
-		return 1;
-
-	return 0;
+		return (1);
+	int	right = find_value(root->right, value);
+	int	left = find_value(root->left, value);
+	if (right || left)
+		return (1);
+	return (0);
 }
 
 int	main()
