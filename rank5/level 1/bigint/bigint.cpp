@@ -1,180 +1,202 @@
+
 #include "bigint.hpp"
 #include <sstream>
-
-bigint::bigint() : digits("0")
-{
-}
-
+#include <algorithm>
+ 
+bigint::bigint() : digits("0") {}
+ 
 bigint::bigint(unsigned long value)
 {
 	std::ostringstream	oss;
-
+ 
 	oss << value;
-	digits = oss.str();
-	trimLeadingZeros();
+	this->digits = oss.str();
 }
-
-bigint::bigint(const std::string &value) : digits(value)
+ 
+bigint::bigint(std::string num) : digits(num)
 {
-	trimLeadingZeros();
+	this->trimLeadingZeros();
 }
-
-bigint::bigint(const bigint &rhs) : digits(rhs.digits)
+ 
+bigint::bigint(const bigint &rhs)
 {
+	*this = rhs;
 }
-
-bigint::~bigint()
-{
-}
-
+ 
+bigint::~bigint() {}
+ 
 bigint	&bigint::operator=(const bigint &rhs)
 {
 	if (this != &rhs)
-		digits = rhs.digits;
+	{
+		this->digits = rhs.digits;
+	}
 	return (*this);
 }
-
+ 
 void	bigint::trimLeadingZeros()
 {
-	size_t	firstNonZero = digits.find_first_not_of('0');
-
-	if (firstNonZero == std::string::npos)
-		digits = "0";
-	else
-		digits = digits.substr(firstNonZero);
+	while (this->digits.size() > 1 && this->digits[0] == '0')
+		this->digits.erase(0, 1);
+	if (this->digits.empty())
+		this->digits = "0";
 }
-
-unsigned long	bigint::toShiftCount() const
+ 
+size_t	bigint::toShiftCount(const bigint &rhs) const
 {
-	std::istringstream	iss(digits);
-	unsigned long		value;
-
-	iss >> value;
-	return (value);
+	size_t	count = 0;
+	size_t	i = 0;
+ 
+	while (i < rhs.digits.size())
+	{
+		count = count * 10 + (rhs.digits[i] - '0');
+		i++;
+	}
+	return (count);
 }
-
-bigint	&bigint::operator+=(const bigint &rhs)
+ 
+void	bigint::halve()
 {
 	std::string	result;
 	int			carry = 0;
-	int			i = static_cast<int>(digits.size()) - 1;
-	int			j = static_cast<int>(rhs.digits.size()) - 1;
-
-	while (i >= 0 || j >= 0 || carry)
+	size_t		i = 0;
+ 
+	while (i < this->digits.size())
 	{
-		int	sum = carry;
-
-		if (i >= 0)
-			sum += digits[i--] - '0';
-		if (j >= 0)
-			sum += rhs.digits[j--] - '0';
-		carry = sum / 10;
-		result.insert(result.begin(), static_cast<char>('0' + (sum % 10)));
+		int current = carry * 10 + (this->digits[i] - '0');
+		result += (current / 2) + '0';
+		carry = current % 2;
+		i++;
 	}
-	digits = result;
-	trimLeadingZeros();
+	this->digits = result;
+	this->trimLeadingZeros();
+}
+ 
+bigint	&bigint::operator+=(const bigint &rhs)
+{
+	std::string	result;
+	size_t		i = this->digits.size();
+	size_t		j = rhs.digits.size();
+	int			hold = 0;
+ 
+	while (i > 0 || j > 0 || hold)
+	{
+		int sum = hold;
+		if (i > 0)
+			sum += this->digits[--i] - '0';
+		if (j > 0)
+			sum += rhs.digits[--j] - '0';
+		hold = sum / 10;
+		result += (sum % 10) + '0';
+	}
+	std::reverse(result.begin(), result.end());
+	this->digits = result;
 	return (*this);
 }
-
+ 
 bigint	bigint::operator+(const bigint &rhs) const
 {
-	bigint	outcome = *this;
-
+	bigint outcome = *this;
+ 
 	outcome += rhs;
 	return (outcome);
 }
-
+ 
 bigint	&bigint::operator++()
 {
-	*this += bigint(static_cast<unsigned long>(1));
+	*this += 1;
 	return (*this);
 }
-
+ 
 bigint	bigint::operator++(int)
 {
-	bigint	outcome = *this;
-
-	*this += bigint(static_cast<unsigned long>(1));
-	return (outcome);
+	bigint temp = *this;
+ 
+	*this += 1;
+	return (temp);
 }
-
+ 
 bigint	&bigint::operator<<=(const bigint &rhs)
 {
-	unsigned long	shift = rhs.toShiftCount();
-
-	if (digits != "0")
+	size_t	count = this->toShiftCount(rhs);
+	size_t	i = 0;
+ 
+	while (i < count)
 	{
-		for (unsigned long k = 0; k < shift; k++)
-			digits += '0';
+		*this += *this;
+		i++;
 	}
 	return (*this);
 }
-
+ 
 bigint	&bigint::operator>>=(const bigint &rhs)
 {
-	unsigned long	shift = rhs.toShiftCount();
-
-	if (shift >= digits.size())
-		digits = "0";
-	else
-		digits = digits.substr(0, digits.size() - shift);
-	trimLeadingZeros();
+	size_t	count = this->toShiftCount(rhs);
+	size_t	i = 0;
+ 
+	while (i < count)
+	{
+		this->halve();
+		i++;
+	}
 	return (*this);
 }
-
+ 
 bigint	bigint::operator<<(const bigint &rhs) const
 {
-	bigint	outcome = *this;
-
+	bigint outcome = *this;
+ 
 	outcome <<= rhs;
 	return (outcome);
 }
-
+ 
 bigint	bigint::operator>>(const bigint &rhs) const
 {
-	bigint	outcome = *this;
-
+	bigint outcome = *this;
+ 
 	outcome >>= rhs;
 	return (outcome);
 }
-
+ 
 bool	bigint::operator==(const bigint &rhs) const
 {
-	return (digits == rhs.digits);
+	if (this->digits == rhs.digits)
+		return (true);
+	return (false);
 }
-
+ 
 bool	bigint::operator!=(const bigint &rhs) const
 {
-	return (digits != rhs.digits);
+	return (!(*this == rhs));
 }
-
+ 
 bool	bigint::operator<(const bigint &rhs) const
 {
-	if (digits.size() != rhs.digits.size())
-		return (digits.size() < rhs.digits.size());
-	return (digits < rhs.digits);
+	if (this->digits.size() != rhs.digits.size())
+		return (this->digits.size() < rhs.digits.size());
+	return (this->digits < rhs.digits);
 }
-
-bool	bigint::operator<=(const bigint &rhs) const
-{
-	return (*this < rhs || *this == rhs);
-}
-
+ 
 bool	bigint::operator>(const bigint &rhs) const
 {
-	return (!(*this <= rhs));
+	return (rhs < *this);
 }
-
+ 
+bool	bigint::operator<=(const bigint &rhs) const
+{
+	return (!(rhs < *this));
+}
+ 
 bool	bigint::operator>=(const bigint &rhs) const
 {
 	return (!(*this < rhs));
 }
-
+ 
 const std::string	&bigint::getDigits() const
 {
-	return (digits);
+	return (this->digits);
 }
-
+ 
 std::ostream	&operator<<(std::ostream &lhs, const bigint &rhs)
 {
 	lhs << rhs.getDigits();
