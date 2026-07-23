@@ -1,37 +1,42 @@
 #include <stdbool.h>
-#include <unistd.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-
-bool **alloc_map(int y, int x)
+bool	**alloc_map(int width, int heigth)
 {
-	bool **map = calloc(y + 1, sizeof(bool *));
-	for (int i = 0; i < y + 1; i++)
-		map[i] = calloc(x + 1, sizeof(bool));
+	bool **map = calloc(heigth + 1, sizeof(bool *));
+	for (int i = 0; i < heigth + 1; i++)
+		map[i] = calloc(width + 1, sizeof(bool));
 	return (map);
 }
 
-void print_map(bool **map, int y, int x)
+void print_map(bool **map, int width, int heigth)
 {
-	for (int i = 0; i < y; i++)
+	for (int y = 0; y < heigth; y++)
 	{
-		for (int j = 0; j < x; j++)
+		for (int x = 0; x < width; x++)
 		{
-			if (map[i][j] == true)
+			
+			if (map[y][x] == true)
 				putchar('0');
-			else if (map[i][j] == false)
+			else
 				putchar(' ');
 		}
 		putchar('\n');
 	}
 }
 
-bool **write_to_map(bool **map, int heigth, int width, char *buf)
+void write_to_map(bool **map, int width, int heigth)
 {
-	int y = 0, x = 0;
-	bool pen = false;
-	for (int i = 0; buf[i]; i++)
+	char buf[1028];
+
+	int n = read(STDIN_FILENO, buf, 1028);
+	int pen = false;
+	int	x = 0;
+	int	y = 0;
+
+	for (int i = 0; i < n; i++)
 	{
 		if (buf[i] == 'w')
 			y--;
@@ -43,19 +48,12 @@ bool **write_to_map(bool **map, int heigth, int width, char *buf)
 			x++;
 		else if (buf[i] == 'x')
 			pen = !pen;
-		else if (buf[i] == '\n')
-			return (map);
-		else
-			return (false);
-		if (y < 0 || y > heigth || x < 0 || x > width)
-			return (false);
-		if (pen)
+		if (pen && x >= 0 && x < width && y >= 0 && y < heigth)
 			map[y][x] = true;
 	}
-	return (map);
 }
 
-int count_around(bool **map, int y, int x)
+int	count_around(bool **map, int x, int y)
 {
 	int count = 0;
 	if (y > 0 && x > 0 && map[y - 1][x - 1] == true)
@@ -77,36 +75,43 @@ int count_around(bool **map, int y, int x)
 	return (count);
 }
 
-bool **it_game(bool **map, int y, int x)
+bool **next_gen(bool **map, int width, int heigth)
 {
-	bool **new_map = alloc_map(y, x);
-	for (int i = 0; i < y; i++)
+	bool **next = alloc_map(width, heigth);
+
+	for (int y = 0; y < heigth; y++)
 	{
-		for (int j = 0; j < x; j++)
+		for (int x = 0; x < width; x++)
 		{
-			int count = count_around(map, i, j);
+			int	count = count_around(map, x, y);
 			if (count == 3)
-				new_map[i][j] = true;
-			else if (count == 2 && map[i][j])
-				new_map[i][j] = true;
+				next[y][x] = true;
+			else if (count == 2 && map[y][x])
+				next[y][x] = true;
 		}
 	}
-	return (new_map);
+	return (next);
 }
 
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
 	if (argc != 4)
 		return (1);
-	int x = atoi(argv[1]), y = atoi(argv[2]), it = atoi(argv[3]);
-	bool **map = alloc_map(y, x);
-	char buf[1028];
-	read(STDIN_FILENO, buf, 1028);
-	map = write_to_map(map, y, x, buf);
-	if (!map)
-		return (1);
-	for (int i = 0; i < it; i++)
-		map = it_game(map, y, x);
-	print_map(map, y, x);
+
+	int	width = atoi(argv[1]);
+	int	heigth = atoi(argv[2]);
+	int	iter = atoi(argv[3]);
+
+	(void)iter;
+
+	bool **map = alloc_map(width, heigth);
+	// char buf[1028];
+	// read(STDIN_FILENO, buf, 1028);
+	write_to_map(map, width, heigth);
+	while (iter-- > 0)
+		map = next_gen(map, width, heigth);
+	print_map(map, width, heigth);
+	
+
 	return (0);
 }
