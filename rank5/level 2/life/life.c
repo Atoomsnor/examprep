@@ -3,12 +3,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-bool	**alloc_map(int width, int heigth)
+bool **alloc_map(int width, int heigth)
 {
-	bool **map = calloc(heigth + 1, sizeof(bool *));
+	bool **new = calloc(heigth + 1, sizeof(bool *));
 	for (int i = 0; i < heigth + 1; i++)
-		map[i] = calloc(width + 1, sizeof(bool));
-	return (map);
+		new[i] = calloc(width + 1, sizeof(bool));
+	return (new);
 }
 
 void print_map(bool **map, int width, int heigth)
@@ -102,7 +102,7 @@ int	main(int argc, char **argv)
 	int	heigth = atoi(argv[2]);
 	int	iter = atoi(argv[3]);
 
-	(void)iter;
+	// (void)iter;
 
 	bool **map = alloc_map(width, heigth);
 	// char buf[1028];
